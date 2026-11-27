@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512">
+  <title>TV 槓桿 ROE BY 藍夜</title>
+  <rect x="0" y="0" width="100" height="100" rx="22" fill="#0b1a3a"/>
+  <circle cx="56" cy="40" r="25" fill="#cfe0ff"/>
+  <circle cx="67" cy="31" r="22" fill="#0b1a3a"/>
+  <polyline points="14,80 34,62 48,70 70,46 86,30" fill="none" stroke="#35d39a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="74,29 87,29 87,42" fill="none" stroke="#35d39a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
