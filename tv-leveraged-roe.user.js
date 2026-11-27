@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TV 槓桿 ROE
 // @namespace    lanye.tv-leveraged-roe
-// @version      1.0.2
+// @version      1.0.3
 // @description  將 TradingView 圖表上的 Gate 持倉標籤改為顯示槓桿倍數與含槓桿收益率（ROE%），並遮蔽帳戶資訊，適合直播使用。BY 藍夜
 // @author       藍夜
 // @homepageURL  https://github.com/vito20051124/TV_ROE-
@@ -28,7 +28,7 @@
     labelHeight: 21,
   };
 
-  console.info('%cTV 槓桿 ROE v1.0.2 BY 藍夜', 'color:#2962ff;font-weight:bold');
+  console.info('%cTV 槓桿 ROE v1.0.3 BY 藍夜', 'color:#2962ff;font-weight:bold');
 
   const num = s => parseFloat(String(s == null ? '' : s).replace(/−/g, '-').replace(/[^0-9.\-]/g, ''));
 
@@ -49,7 +49,13 @@
       });
       if (!r.ok) return;
       const j = await r.json();
-      gate.set(c, { levMax: num(j.leverage_max), mark: num(j.mark_price), t: Date.now() });
+      gate.set(c, {
+        levMax: num(j.leverage_max),
+        mark: num(j.mark_price),
+        mult: num(j.quanto_multiplier),
+        takerFee: num(j.taker_fee_rate),
+        t: Date.now(),
+      });
     } catch (e) {}
   }
 
@@ -92,8 +98,24 @@
         const avg = num(p.avgPrice);
         if (!(avg > 0) || !(mark > 0) || !(lev > 0)) continue;
         const isLong = p.side === 1 || p.side === 'buy';
-        const raw = (isLong ? mark - avg : avg - mark) / avg;
-        next.push({ symbol: p.symbol, isLong, avg, lev, roe: raw * lev * 100 });
+        const qty = Math.abs(num(p.qty));
+        const mult = g && g.mult > 0 ? g.mult : NaN;
+        const im = num(ex.initialMargin);
+        const upl = num(p.unrealizedPl);
+        const useActualMargin = im > 0 && lev === actualLev;
+        let roe;
+        if (qty > 0 && mult > 0) {
+          const value = mark * qty * mult;
+          const pnl = (isLong ? mark - avg : avg - mark) * qty * mult;
+          const margin = useActualMargin ? im : value / lev + value * (g.takerFee > 0 ? g.takerFee : 0);
+          roe = pnl / margin * 100;
+        } else if (useActualMargin && isFinite(upl)) {
+          roe = upl / im * 100;
+        } else {
+          roe = (isLong ? mark - avg : avg - mark) / avg * lev * 100;
+        }
+        if (!isFinite(roe)) continue;
+        next.push({ symbol: p.symbol, isLong, avg, lev, roe });
       }
       wanted = contracts;
       state = next;
