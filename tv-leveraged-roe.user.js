@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TV 槓桿 ROE
 // @namespace    lanye.tv-leveraged-roe
-// @version      1.0.1
+// @version      1.0.2
 // @description  將 TradingView 圖表上的 Gate 持倉標籤改為顯示槓桿倍數與含槓桿收益率（ROE%），並遮蔽帳戶資訊，適合直播使用。BY 藍夜
 // @author       藍夜
 // @homepageURL  https://github.com/vito20051124/TV_ROE-
@@ -28,7 +28,7 @@
     labelHeight: 21,
   };
 
-  console.info('%cTV 槓桿 ROE v1.0.1 BY 藍夜', 'color:#2962ff;font-weight:bold');
+  console.info('%cTV 槓桿 ROE v1.0.2 BY 藍夜', 'color:#2962ff;font-weight:bold');
 
   const num = s => parseFloat(String(s == null ? '' : s).replace(/−/g, '-').replace(/[^0-9.\-]/g, ''));
 
@@ -131,13 +131,28 @@
       const pctW = (r2 - l2 + 1) / k;
       if (pctW < 24 || pctW > 140) return null;
 
-      const qx = l2 - Math.max(2, Math.round(3 * k));
-      if (qx < 0) return null;
-      const cq = col(qx);
-      if (cq === cp) return null;
+      const maxSkip = Math.round(10 * k);
+      const minFill = Math.round(12 * k);
       const maxQty = Math.round(64 * k);
-      let l1 = qx;
-      while (l1 - 1 >= 0 && qx - (l1 - 1) < maxQty && col(l1 - 1) === cq) l1--;
+      const runLeft = (x, c) => {
+        let n = 1;
+        while (n < maxQty && x - n >= 0 && col(x - n) === c) n++;
+        return n;
+      };
+      let qx = -1;
+      let qRun = 0;
+      for (let x = l2 - 1; x >= 0 && l2 - x <= maxSkip; x--) {
+        const c = col(x);
+        if (c === cp) continue;
+        const n = runLeft(x, c);
+        if (n >= minFill) {
+          qx = x;
+          qRun = n;
+          break;
+        }
+      }
+      if (qx < 0) return null;
+      const l1 = qx - qRun + 1;
 
       const left = bb.left + (xa + l1) / k - 2;
       const right = bb.left + (xa + r2 + 1) / k + 2.5;
