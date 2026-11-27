@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TV 槓桿 ROE
 // @namespace    lanye.tv-leveraged-roe
-// @version      1.0.3
+// @version      1.0.4
 // @description  將 TradingView 圖表上的 Gate 持倉標籤改為顯示槓桿倍數與含槓桿收益率（ROE%），並遮蔽帳戶資訊，適合直播使用。BY 藍夜
 // @author       藍夜
 // @homepageURL  https://github.com/vito20051124/TV_ROE-
@@ -28,7 +28,7 @@
     labelHeight: 21,
   };
 
-  console.info('%cTV 槓桿 ROE v1.0.3 BY 藍夜', 'color:#2962ff;font-weight:bold');
+  console.info('%cTV 槓桿 ROE v1.0.4 BY 藍夜', 'color:#2962ff;font-weight:bold');
 
   const num = s => parseFloat(String(s == null ? '' : s).replace(/−/g, '-').replace(/[^0-9.\-]/g, ''));
 
@@ -84,6 +84,7 @@
       const next = [];
       for (const p of list || []) {
         if (!/^GATE:/i.test(String(p.symbol))) continue;
+        if (!(Math.abs(num(p.qty)) > 0)) continue;
         const c = toContract(p.symbolDisplayName || String(p.symbol).split(':').pop());
         if (c) contracts.add(c);
         const g = c ? gate.get(c) : null;
