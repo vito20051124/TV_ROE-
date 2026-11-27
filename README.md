@@ -34,17 +34,28 @@ TradingView 連接 Gate 後，圖表上的持倉標籤原本顯示「持倉數�
 
 ### 1. 安裝 Tampermonkey
 
-到 Chrome 線上應用程式商店安裝 [Tampermonkey](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)。Edge 使用者請在 Edge 外掛程式商店搜尋 Tampermonkey。
+- **Chrome**：[Chrome 線上應用程式商店 - Tampermonkey](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+- **Edge**：[Edge 外掛程式商店 - Tampermonkey](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd)
 
-### 2. 允許使用者指令碼（很重要）
+### 2. 允許使用者指令碼（⚠️ 最重要，每台電腦都要設定）
 
-新版 Chrome 預設會擋住使用者腳本，不開這項的話腳本不會執行：
+瀏覽器預設會擋住使用者腳本，**沒開這項的話腳本完全不會執行**。這個設定是每台電腦、每個瀏覽器分開的，**換電腦或換瀏覽器都要重新設定一次**。
+
+**Chrome**
 
 1. 網址列輸入 `chrome://extensions` 並按 Enter。
 2. 找到 Tampermonkey，點「詳細資料」。
 3. 開啟「**允許使用者指令碼**」。
 
-> 如果找不到這個選項，代表 Chrome 版本較舊，請改為開啟擴充功能頁右上角的「**開發人員模式**」。
+> 找不到這個選項的話，代表 Chrome 版本較舊，請改為開啟擴充功能頁右上角的「**開發人員模式**」。
+
+**Edge**
+
+1. 網址列輸入 `edge://extensions` 並按 Enter。
+2. 開啟**左側欄**的「**開發人員模式**」。
+3. 點 Tampermonkey 的「詳細資料」，如果有「**允許使用者指令碼**」也一併開啟。
+
+設定完成後，重新整理 TradingView 頁面。
 
 ### 3. 安裝腳本
 
@@ -103,9 +114,13 @@ Tampermonkey 會自動檢查並更新到最新版本。想立即更新的話：T
 ## 常見問題
 
 **裝了沒有反應？**
-1. 確認第 2 步的「允許使用者指令碼」已開啟。
-2. 確認 Tampermonkey 裡本腳本是啟用狀態。
-3. 確認網址是 `tradingview.com/chart/...`，然後重新整理頁面。
+
+先確認腳本有沒有執行：在 TradingView 圖表頁按 `F12`，切到「Console（主控台）」，找找看有沒有藍色的「**TV 槓桿 ROE v… BY 藍夜**」。
+
+- **沒有這行**：代表腳本沒有執行，九成是第 2 步的「允許使用者指令碼」沒開，換電腦或換瀏覽器時特別容易漏掉。另外也確認 Tampermonkey 裡本腳本是啟用狀態。
+- **有這行但沒有標籤**：確認下方交易面板已連接 **Gate** 帳戶、目前圖表是有持倉的幣種，而且網址是 `tradingview.com/chart/...`（TradingView 桌面版 App 無法使用）。
+
+> 主控台裡大量的 `ERR_BLOCKED_BY_CLIENT` 是廣告封鎖擴充功能擋掉 TradingView 的追蹤統計，和本腳本無關，可以忽略。
 
 **標籤邊緣露出一點原生標籤？**
 請到 [Issues](https://github.com/vito20051124/TV_ROE-/issues) 回報，並附上截圖和瀏覽器縮放比例。
